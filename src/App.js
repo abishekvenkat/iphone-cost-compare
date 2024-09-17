@@ -201,7 +201,7 @@ const prices = {
 };
 
 function App() {
-  const [model, setModel] = useState("iPhone 16 Pro 128GB");
+  const [model, setModel] = useState("iPhone 16 128GB");
   const [currency, setCurrency] = useState("USD");
   const [results, setResults] = useState({});
   const [currencyRates, setCurrencyRates] = useState({});
