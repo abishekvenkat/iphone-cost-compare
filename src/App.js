@@ -1,19 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    Button,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-} from '@mui/material';
 import './App.css'; // Importing CSS for styling
 
 const prices = {
@@ -125,128 +111,115 @@ const prices = {
 };
 
 function App() {
-    const [model, setModel] = useState("iPhone 16 Pro 128GB");
-    const [currency, setCurrency] = useState("USD");
-    const [results, setResults] = useState({});
-    const [currencyRates, setCurrencyRates] = useState({});
-    const [darkMode, setDarkMode] = useState(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const [showTable, setShowTable] = useState(false); // State to control table visibility
+  const [model, setModel] = useState("iPhone 16 Pro 128GB");
+  const [currency, setCurrency] = useState("USD");
+  const [results, setResults] = useState({});
+  const [currencyRates, setCurrencyRates] = useState({});
+  const [showTable, setShowTable] = useState(false);
 
-    const fetchCurrencyRates = async () => {
-        try {
-            const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
-            setCurrencyRates(response.data.rates);
-        } catch (error) {
-            console.error("Error fetching currency rates:", error);
-        }
-    };
+  useEffect(() => {
+      fetchCurrencyRates();
+  }, []);
 
-    useEffect(() => {
-        fetchCurrencyRates();
-    }, []);
+  const fetchCurrencyRates = async () => {
+      try {
+          const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
+          setCurrencyRates(response.data.rates);
+      } catch (error) {
+          console.error("Error fetching currency rates:", error);
+      }
+  };
 
-    const handleCurrencyChange = (e) => {
-        setCurrency(e.target.value);
-        setShowTable(false); // Hide table when currency changes
-    };
+  const handleCurrencyChange = (e) => {
+      setCurrency(e.target.value);
+      setShowTable(false);
+  };
 
-    const handleModelChange = (e) => {
-        setModel(e.target.value);
-        setShowTable(false); // Hide table when model changes
-    };
+  const handleModelChange = (e) => {
+      setModel(e.target.value);
+      setShowTable(false);
+  };
 
-    const handleCalculate = () => {
-        handleCompare(currency); // Calculate prices when button is clicked
-        setShowTable(true); // Show table after calculation
-    };
+  const handleCalculate = () => {
+      handleCompare(currency);
+      setShowTable(true);
+  };
 
-    const handleCompare = (selectedCurrency) => {
-        const convertedPrices = {};
-        for (const country in prices[model]) {
-            const { price, currency: originalCurrency } = prices[model][country];
-            
-            // Check if the selected currency is the same as the original currency
-            const priceInSelectedCurrency = (selectedCurrency === originalCurrency) 
-                ? price // No conversion needed
-                : price * (currencyRates[selectedCurrency] / currencyRates[originalCurrency]); // Perform conversion
+  const handleCompare = (selectedCurrency) => {
+      const convertedPrices = {};
+      for (const country in prices[model]) {
+          const { price, currency: originalCurrency } = prices[model][country];
+          const priceInSelectedCurrency = (selectedCurrency === originalCurrency) 
+              ? price 
+              : price * (currencyRates[selectedCurrency] / currencyRates[originalCurrency]);
 
-            convertedPrices[country] = {
-                original: price,
-                originalCurrency,
-                converted: Math.round(priceInSelectedCurrency),
-            };
-        }
-        setResults(convertedPrices);
-    };
+          convertedPrices[country] = {
+              original: price,
+              originalCurrency,
+              converted: Math.round(priceInSelectedCurrency),
+          };
+      }
+      setResults(convertedPrices);
+  };
 
-    return (
-        <div className={`app-container ${darkMode ? 'dark' : 'light'}`}>
-            <h1>iPhone 16 Cost Compare</h1>
-            <div className="theme-switch" onClick={() => setDarkMode(!darkMode)}>
-                <input type="checkbox" checked={darkMode} readOnly />
-                <span className="slider"></span>
-            </div>
-            <div className="selector-container">
-                <FormControl variant="outlined" style={{ marginBottom: '10px', minWidth: '100%' }}>
-                    <InputLabel style={{ color: darkMode ? '#fff' : '#000' }}>Select iPhone Model</InputLabel>
-                    <Select
-                        value={model}
-                        onChange={handleModelChange} // Trigger model change
-                        style={{ fontSize: '0.9rem', padding: '8px', color: darkMode ? '#fff' : '#000', backgroundColor: darkMode ? '#424242' : '#fff' }} // Adjust for dark mode
-                    >
-                        {Object.keys(prices).map((modelName) => (
-                            <MenuItem key={modelName} value={modelName}>{modelName}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <FormControl variant="outlined" style={{ marginBottom: '10px', minWidth: '100%' }}>
-                    <InputLabel style={{ color: darkMode ? '#fff' : '#000' }}>Select Currency</InputLabel>
-                    <Select
-                        value={currency}
-                        onChange={handleCurrencyChange} // Trigger currency change
-                        style={{ fontSize: '0.9rem', padding: '8px', color: darkMode ? '#fff' : '#000', backgroundColor: darkMode ? '#424242' : '#fff' }} // Adjust for dark mode
-                    >
-                        <MenuItem value="USD">US Dollar</MenuItem>
-                        <MenuItem value="CAD">Canadian Dollar</MenuItem>
-                        <MenuItem value="AED">UAE Dirham</MenuItem>
-                        <MenuItem value="GBP">British Pound</MenuItem>
-                        <MenuItem value="EUR">Euro</MenuItem>
-                        <MenuItem value="SGD">Singapore Dollar</MenuItem>
-                        <MenuItem value="AUD">Australian Dollar</MenuItem>
-                        <MenuItem value="INR">Indian Rupee</MenuItem>
-                        <MenuItem value="VND">Vietnamese Dong</MenuItem>
-                        <MenuItem value="CNY">Chinese Yuan</MenuItem>
-                        <MenuItem value="JPY">Japanese Yen</MenuItem>
-                        <MenuItem value="HKD">Hong Kong Dollar</MenuItem>
-                        <MenuItem value="THB">Thai Baht</MenuItem>
-                    </Select>
-                </FormControl>
-                <Button variant="contained" color="primary" onClick={handleCalculate} style={{ width: '100%' }}>Compare</Button>
-            </div>
-            {showTable && Object.entries(results).length > 0 && (
-                <TableContainer component={Paper} style={{ backgroundColor: darkMode ? '#424242' : '#fff', maxWidth: '600px', margin: '20px auto' }}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell style={{ color: darkMode ? '#fff' : '#000', textAlign: 'center' }}>Country</TableCell>
-                                <TableCell style={{ color: darkMode ? '#fff' : '#000', textAlign: 'center' }}>Original Cost</TableCell>
-                                <TableCell style={{ color: darkMode ? '#fff' : '#000', textAlign: 'center' }}>Converted Cost ({currency})</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {Object.entries(results).map(([country, { original, originalCurrency, converted }]) => (
-                                <TableRow key={country}>
-                                    <TableCell style={{ color: darkMode ? '#fff' : '#000', textAlign: 'center' }}>{country}</TableCell>
-                                    <TableCell style={{ color: darkMode ? '#fff' : '#000', textAlign: 'center' }}>{original} {originalCurrency}</TableCell>
-                                    <TableCell style={{ color: darkMode ? '#fff' : '#000', textAlign: 'center' }}>{converted} {currency}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
-        </div>
-    );
+  return (
+      <div className="dot-matrix-container">
+          <h1 className="dot-matrix-title">iPhone 16 Cost Compare</h1>
+          <div className="selector-container">
+              <div className="select-wrapper">
+                  <label htmlFor="model-select">Select iPhone Model:</label>
+                  <select id="model-select" value={model} onChange={handleModelChange}>
+                      {Object.keys(prices).map((modelName) => (
+                          <option key={modelName} value={modelName}>{modelName}</option>
+                      ))}
+                  </select>
+              </div>
+              <div className="select-wrapper">
+                  <label htmlFor="currency-select">Select Currency:</label>
+                  <select id="currency-select" value={currency} onChange={handleCurrencyChange}>
+                      <option value="USD">US Dollar</option>
+                      <option value="CAD">Canadian Dollar</option>
+                      <option value="AED">UAE Dirham</option>
+                      <option value="GBP">British Pound</option>
+                      <option value="EUR">Euro</option>
+                      <option value="SGD">Singapore Dollar</option>
+                      <option value="AUD">Australian Dollar</option>
+                      <option value="INR">Indian Rupee</option>
+                      <option value="VND">Vietnamese Dong</option>
+                      <option value="CNY">Chinese Yuan</option>
+                      <option value="JPY">Japanese Yen</option>
+                      <option value="HKD">Hong Kong Dollar</option>
+                      <option value="THB">Thai Baht</option>
+                  </select>
+              </div>
+              <button onClick={handleCalculate} className="dot-matrix-button">
+                  Compare
+              </button>
+          </div>
+          {showTable && Object.entries(results).length > 0 && (
+              <div className="dot-matrix-table-container">
+                  <table className="dot-matrix-table">
+                      <thead>
+                          <tr>
+                              <th>Country</th>
+                              <th>Original Cost</th>
+                              <th>Converted Cost ({currency})</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {Object.entries(results).map(([country, { original, originalCurrency, converted }]) => (
+                              <tr key={country}>
+                                  <td>{country}</td>
+                                  <td>{original} {originalCurrency}</td>
+                                  <td>{converted} {currency}</td>
+                              </tr>
+                          ))}
+                      </tbody>
+                  </table>
+              </div>
+          )}
+      </div>
+  );
 }
 
 export default App;
