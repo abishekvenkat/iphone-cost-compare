@@ -187,24 +187,24 @@ function App() {
                 <span className="slider"></span>
             </div>
             <div className="selector-container">
-                <FormControl variant="outlined" style={{ marginRight: '10px', minWidth: 180 }}>
+                <FormControl variant="outlined" style={{ marginBottom: '10px', minWidth: '100%' }}>
                     <InputLabel style={{ color: darkMode ? '#fff' : '#000' }}>Select iPhone Model</InputLabel>
                     <Select
                         value={model}
                         onChange={handleModelChange} // Trigger model change
-                        style={{ fontSize: '0.9rem', padding: '8px', marginTop: '8px', color: darkMode ? '#fff' : '#000', backgroundColor: darkMode ? '#424242' : '#fff' }} // Adjust for dark mode
+                        style={{ fontSize: '0.9rem', padding: '8px', color: darkMode ? '#fff' : '#000', backgroundColor: darkMode ? '#424242' : '#fff' }} // Adjust for dark mode
                     >
                         {Object.keys(prices).map((modelName) => (
                             <MenuItem key={modelName} value={modelName}>{modelName}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
-                <FormControl variant="outlined" style={{ marginRight: '10px', minWidth: 180 }}>
+                <FormControl variant="outlined" style={{ marginBottom: '10px', minWidth: '100%' }}>
                     <InputLabel style={{ color: darkMode ? '#fff' : '#000' }}>Select Currency</InputLabel>
                     <Select
                         value={currency}
                         onChange={handleCurrencyChange} // Trigger currency change
-                        style={{ fontSize: '0.9rem', padding: '8px', marginTop: '8px', color: darkMode ? '#fff' : '#000', backgroundColor: darkMode ? '#424242' : '#fff' }} // Adjust for dark mode
+                        style={{ fontSize: '0.9rem', padding: '8px', color: darkMode ? '#fff' : '#000', backgroundColor: darkMode ? '#424242' : '#fff' }} // Adjust for dark mode
                     >
                         <MenuItem value="USD">US Dollar</MenuItem>
                         <MenuItem value="CAD">Canadian Dollar</MenuItem>
@@ -221,10 +221,10 @@ function App() {
                         <MenuItem value="THB">Thai Baht</MenuItem>
                     </Select>
                 </FormControl>
-                <Button variant="contained" color="primary" onClick={handleCalculate}>Compare</Button>
+                <Button variant="contained" color="primary" onClick={handleCalculate} style={{ width: '100%' }}>Compare</Button>
             </div>
             {showTable && Object.entries(results).length > 0 && (
-                <TableContainer component={Paper} style={{ backgroundColor: darkMode ? '#424242' : '#fff', maxWidth: '600px', margin: '0 auto' }}>
+                <TableContainer component={Paper} style={{ backgroundColor: darkMode ? '#424242' : '#fff', maxWidth: '600px', margin: '20px auto' }}>
                     <Table>
                         <TableHead>
                             <TableRow>
