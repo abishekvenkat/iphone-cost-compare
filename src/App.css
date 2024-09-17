@@ -72,7 +72,14 @@ h1 {
 .selector-container {
     margin: 12px 0;
     display: flex;
-    align-items: center;
+    flex-direction: column; /* Stack elements vertically on small screens */
+    align-items: stretch; /* Make dropdowns full width */
+}
+
+@media (min-width: 600px) {
+    .selector-container {
+        flex-direction: row; /* Row layout for larger screens */
+    }
 }
 
 .MuiInputLabel-root {
@@ -81,6 +88,13 @@ h1 {
 
 .MuiSelect-root {
     padding: 6px; /* Adjust padding for select */
+    width: 100%; /* Make select full width */
+}
+
+@media (min-width: 600px) {
+    .MuiSelect-root {
+        width: auto; /* Reset width for larger screens */
+    }
 }
 
 label {
@@ -99,6 +113,13 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%; /* Make button full width */
+}
+
+@media (min-width: 600px) {
+    button {
+        width: auto; /* Reset width for larger screens */
+    }
 }
 
 button:hover {
@@ -107,7 +128,7 @@ button:hover {
 
 .results-table {
     margin-top: 20px;
-    width: 100%;
+    width: 100%; /* Make table full width */
     border-collapse: collapse;
 }
 
